@@ -1,0 +1,3 @@
+The capital of France is Paris.
+
+[Knowledge source] The DirectPromptAgent issues a bare user-message request to gpt-3.5-turbo with NO system prompt and NO injected knowledge. The answer therefore comes from the LLM's pretraining data (parametric knowledge) — there is no retrieval, no persona, no custom context.

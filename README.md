@@ -94,3 +94,25 @@ pricing.
 ## License
 
 MIT.
+
+## Test-script outputs (rubric Agent Testing)
+
+Per the rubric's Agent Testing line ("Outputs ... are provided for the
+execution of all seven test scripts"), this submission ships verbatim
+terminal output for every Phase 1 test script in
+[`phase_1/outputs/`](phase_1/outputs/):
+
+```
+phase_1/outputs/
+  direct_prompt_agent.txt              answer + 'Knowledge source' explanation
+  augmented_prompt_agent.txt           answer + persona-effect commentary
+  knowledge_augmented_prompt_agent.txt answer confirms use of injected knowledge
+  evaluation_agent.txt                 full 2-iteration worker/judge trace
+  action_planning_agent.txt            extracted scrambled-eggs steps
+  routing_agent.txt                    Texas / Europe / Math routing decisions
+  rag_knowledge_prompt_agent.txt       Clara-podcast retrieval + answer
+```
+
+Each `.txt` file was produced by `python <script>.py > outputs/<script>.txt 2>&1`
+from a clean working directory with `OPENAI_API_KEY` set. The outputs
+collectively prove every implemented agent works end-to-end.

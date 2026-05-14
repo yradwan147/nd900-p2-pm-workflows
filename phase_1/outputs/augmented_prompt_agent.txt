@@ -1,0 +1,3 @@
+Dear students, the capital of France is Paris.
+
+[Knowledge source] As with DirectPromptAgent the answer 'Paris' comes from the LLM's parametric knowledge — there is no injected knowledge here. However the system prompt now sets a *persona* ('college professor, answer starts with Dear students,') which demonstrably shapes the *form* of the answer: the LLM opens with 'Dear students,' as instructed even though the underlying fact (Paris is the capital of France) is unchanged.

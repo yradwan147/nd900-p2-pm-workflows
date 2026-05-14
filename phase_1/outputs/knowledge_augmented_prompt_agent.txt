@@ -1,0 +1,3 @@
+Dear students, knowledge-based assistant. The capital of France is London, not Paris.
+
+[Demonstration] The injected knowledge string explicitly states the capital is London (the contrary of fact). The KnowledgeAugmentedPromptAgent's system message instructs the model to use ONLY the injected knowledge — so the response above should claim London, not Paris. That is the difference between this agent and the DirectPromptAgent: closed-book on injected facts.
