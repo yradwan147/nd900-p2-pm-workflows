@@ -38,10 +38,10 @@ class DirectPromptAgent:
 
     def __init__(self, openai_api_key: str) -> None:
         self.openai_api_key = openai_api_key
+        self.client = OpenAI(api_key=openai_api_key)
 
     def respond(self, prompt: str) -> str:
-        client = OpenAI(api_key=self.openai_api_key)
-        response = client.chat.completions.create(
+        response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "user", "content": prompt},
@@ -61,15 +61,15 @@ class AugmentedPromptAgent:
 
     def __init__(self, openai_api_key: str, persona: str) -> None:
         self.openai_api_key = openai_api_key
+        self.client = OpenAI(api_key=openai_api_key)
         self.persona = persona
 
     def respond(self, input_text: str) -> str:
-        client = OpenAI(api_key=self.openai_api_key)
         system_message = (
             f"You are {self.persona}. Forget any previous context and "
             f"respond from the perspective of this persona only."
         )
-        response = client.chat.completions.create(
+        response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_message},
@@ -90,18 +90,18 @@ class KnowledgeAugmentedPromptAgent:
 
     def __init__(self, openai_api_key: str, persona: str, knowledge: str) -> None:
         self.openai_api_key = openai_api_key
+        self.client = OpenAI(api_key=openai_api_key)
         self.persona = persona
         self.knowledge = knowledge
 
     def respond(self, input_text: str) -> str:
-        client = OpenAI(api_key=self.openai_api_key)
         system_message = (
             f"You are {self.persona} knowledge-based assistant. Forget all previous context.\n"
             f"Use only the following knowledge to answer, do not use your own knowledge: "
             f"{self.knowledge}\n"
             f"Answer the prompt based on this knowledge, not your own."
         )
-        response = client.chat.completions.create(
+        response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_message},
@@ -135,13 +135,13 @@ class RAGKnowledgePromptAgent:
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.openai_api_key = openai_api_key
+        self.client = OpenAI(api_key=openai_api_key)
         self.unique_filename = (
             f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.csv"
         )
 
     def get_embedding(self, text: str) -> list[float]:
-        client = OpenAI(api_key=self.openai_api_key)
-        response = client.embeddings.create(
+        response = self.client.embeddings.create(
             model="text-embedding-3-large",
             input=text,
             encoding_format="float",
@@ -194,8 +194,7 @@ class RAGKnowledgePromptAgent:
             lambda emb: self.calculate_similarity(prompt_embedding, emb)
         )
         best_chunk = df.loc[df["similarity"].idxmax(), "text"]
-        client = OpenAI(api_key=self.openai_api_key)
-        response = client.chat.completions.create(
+        response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": f"You are {self.persona}, a knowledge-based assistant. Forget previous context."},
@@ -225,13 +224,13 @@ class EvaluationAgent:
                  evaluation_criteria: str, worker_agent,
                  max_interactions: int = 10) -> None:
         self.openai_api_key = openai_api_key
+        self.client = OpenAI(api_key=openai_api_key)
         self.persona = persona
         self.evaluation_criteria = evaluation_criteria
         self.worker_agent = worker_agent
         self.max_interactions = max_interactions
 
     def evaluate(self, initial_prompt: str) -> dict:
-        client = OpenAI(api_key=self.openai_api_key)
         prompt_to_evaluate = initial_prompt
         evaluation = ""
         response_from_worker = ""
@@ -251,7 +250,7 @@ class EvaluationAgent:
                 f"Meet this criteria: {self.evaluation_criteria}\n"
                 f"Respond Yes or No, and the reason why it does or doesn't meet the criteria."
             )
-            response = client.chat.completions.create(
+            response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": f"You are {self.persona}."},
@@ -271,7 +270,7 @@ class EvaluationAgent:
             instruction_prompt = (
                 f"Provide instructions to fix an answer based on these reasons why it is incorrect: {evaluation}"
             )
-            response = client.chat.completions.create(
+            response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": f"You are {self.persona}."},
@@ -312,11 +311,11 @@ class RoutingAgent:
 
     def __init__(self, openai_api_key: str, agents: list[dict]) -> None:
         self.openai_api_key = openai_api_key
+        self.client = OpenAI(api_key=openai_api_key)
         self.agents = agents
 
     def get_embedding(self, text: str) -> list[float]:
-        client = OpenAI(api_key=self.openai_api_key)
-        response = client.embeddings.create(
+        response = self.client.embeddings.create(
             model="text-embedding-3-large",
             input=text,
             encoding_format="float",
@@ -358,10 +357,10 @@ class ActionPlanningAgent:
 
     def __init__(self, openai_api_key: str, knowledge: str) -> None:
         self.openai_api_key = openai_api_key
+        self.client = OpenAI(api_key=openai_api_key)
         self.knowledge = knowledge
 
     def extract_steps_from_prompt(self, prompt: str) -> list[str]:
-        client = OpenAI(api_key=self.openai_api_key)
         system_prompt = (
             "You are an action planning agent. Using your knowledge, you extract from "
             "the user prompt the steps requested to complete the action the user is "
@@ -369,7 +368,7 @@ class ActionPlanningAgent:
             "knowledge. Forget any previous context. This is your knowledge: "
             f"{self.knowledge}"
         )
-        response = client.chat.completions.create(
+        response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
